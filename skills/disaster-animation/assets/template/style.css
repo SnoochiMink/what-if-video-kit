@@ -1,0 +1,75 @@
+/* 9:16 stage. Type is sized in cqw (container-query width) against the stage, so the HUD
+   is identical at preview size and at full 1080x1920. Percentages of the viewport break
+   the moment the window changes shape. */
+html, body { margin: 0; height: 100%; background: #050506; overflow: hidden;
+  font-family: 'Arial Black', 'Segoe UI Black', Impact, system-ui, sans-serif; }
+#stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  aspect-ratio: 9 / 16; height: 100%; max-width: 100%; container-type: size;
+  overflow: hidden; background: #000; }
+@media (max-aspect-ratio: 9/16) { #stage { width: 100%; height: auto; } }
+#gl, #grain, #vignette, #hud { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* Grain: 3-4% from a reasonably sized canvas. Higher, or from a tiny canvas, is just blur. */
+#grain { opacity: 0.035; mix-blend-mode: overlay; pointer-events: none; }
+#vignette { pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.38) 100%); }
+#hud { pointer-events: none; color: #fff; }
+.hidehud #hud, .hidehud #timebar { display: none; }
+
+/* TikTok draws its own UI: right ~100-180px is the action rail, bottom ~270px is the
+   caption block. Everything that matters stays inside roughly the central 880x1420. */
+#hook { position: absolute; top: 17%; left: 0; right: 0; text-align: center; opacity: 0;
+  transform: scale(0.92); transition: opacity .35s, transform .5s cubic-bezier(.2,1.6,.4,1); }
+#hook.on { opacity: 1; transform: scale(1); }
+#hook span { display: block; line-height: 1.02; -webkit-text-stroke: 0.5cqw #000;
+  paint-order: stroke fill; text-shadow: 0 0.6cqw 2cqw rgba(0,0,0,.6); }
+#hook .l1, #hook .l3 { font-size: 8.4cqw; }
+#hook .l2 { font-size: 13.5cqw; color: #ffd21f; letter-spacing: -0.02em; }
+
+#counters { position: absolute; top: 12.5%; left: 6%; right: 16%; display: flex; gap: 2cqw;
+  justify-content: center; opacity: 0; transition: opacity .5s; }
+#counters.on { opacity: 1; }
+.ctr { flex: 1; background: rgba(10,10,12,.58); border: 0.3cqw solid rgba(255,255,255,.18);
+  border-radius: 2.4cqw; padding: 1.6cqw 1cqw 1.4cqw; text-align: center;
+  backdrop-filter: blur(4px); position: relative; }
+.ctr label { display: block; font-family: system-ui, 'Segoe UI', sans-serif; font-weight: 800;
+  font-size: 2.3cqw; letter-spacing: .06em; color: #c9ced6; }
+/* tabular numerals + nowrap so the layout does not jitter as digits change */
+.ctr b { display: block; white-space: nowrap; font-size: 5cqw; margin-top: .4cqw;
+  font-variant-numeric: tabular-nums; }
+.ctr.hot { border-color: #ff3b30; background: rgba(120,10,10,.55); animation: pulse .8s infinite alternate; }
+@keyframes pulse { to { box-shadow: 0 0 3cqw rgba(255,59,48,.8); } }
+
+#caption { position: absolute; top: 61%; left: 7%; right: 18%; text-align: center;
+  font-size: 6.6cqw; line-height: 1.12; }
+/* opacity/transform are written per frame from FILM time in director.js,
+   never a CSS animation: that runs on the wall clock and breaks export. */
+#caption span { display: inline-block; opacity: 0;
+  -webkit-text-stroke: 0.55cqw #000; paint-order: stroke fill;   /* stroke, not shadow */
+  text-shadow: 0 .5cqw 1.5cqw rgba(0,0,0,.7); }
+#caption span.em { color: #ffd21f; }
+
+#endcard { position: absolute; inset: 0; padding: 0 9% 0 8%; display: flex; flex-direction: column;
+  justify-content: center; text-align: center; opacity: 0; transition: opacity .8s;
+  background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.78) 35%, rgba(0,0,0,.78) 70%, rgba(0,0,0,.3)); }
+#endcard.on { opacity: 1; }
+#endcard .tag { align-self: center; background: #ffd21f; color: #111; font-size: 5cqw;
+  padding: 1cqw 4cqw; border-radius: 1.6cqw; margin-bottom: 4cqw; }
+#endcard p { font-family: system-ui, 'Segoe UI', sans-serif; font-weight: 700; font-size: 5.4cqw;
+  line-height: 1.3; margin: 0 0 3cqw; }
+#endcard p b { color: #ffd21f; }
+#endcard p .big { font-family: 'Arial Black', Impact, sans-serif; font-size: 7.5cqw; color: #ff4d3a; }
+#endcard p.small { font-size: 4cqw; color: #cfd3da; }
+#endcard .cta { margin-top: 5cqw; font-size: 6cqw; }
+
+#start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; background: rgba(0,0,0,.45); z-index: 5; }
+#start.gone { display: none; }
+#start button { font: inherit; font-size: 5.5cqw; padding: 3cqw 7cqw; border: 0; border-radius: 10cqw;
+  background: #ffd21f; color: #111; cursor: pointer; box-shadow: 0 1cqw 4cqw rgba(0,0,0,.5); }
+#start p { color: #ddd; font-family: system-ui, sans-serif; font-size: 2.8cqw; margin-top: 3cqw; }
+#timebar { position: absolute; left: 0; right: 0; bottom: 0; height: 0.6cqw;
+  background: rgba(255,255,255,.12); z-index: 4; }
+#timebar i { display: block; height: 100%; width: 0; background: #ffd21f; }
+#err { display: none; position: absolute; left: 0; right: 0; top: 0; z-index: 9;
+  background: rgba(160,0,0,.9); color: #fff; font: 12px monospace; white-space: pre-wrap; padding: 8px; }

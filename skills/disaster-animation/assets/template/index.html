@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If {{TITLE}} Hit Your Town?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="hud">
+    <div id="hook">
+      <span class="l1">WHAT IF A</span>
+      <span class="l2">{{TITLEUC}}</span>
+      <span class="l3">HIT YOUR TOWN?</span>
+    </div>
+    <div id="counters">
+      <div class="ctr" id="distBox"><label>DISTANCE TO YOU</label><b id="cDist">&mdash;</b></div>
+      <div class="ctr"><label>INTENSITY</label><b id="cMain">&mdash;</b></div>
+      <div class="ctr"><label>HOMES LOST</label><b id="cLost">0</b></div>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag">REAL FACT</div>
+      <p>Replace this with one <b>real, checkable fact</b> &mdash; a date, a place and a number.</p>
+      <p class="small">See references/disasters/&lt;name&gt;.md for verified candidates.</p>
+      <div class="cta">What would <b>YOU</b> do? 👇</div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play with sound</button>
+    <p>Space pause · R restart · ← → seek 5s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+// Surface errors visually — a thrown exception otherwise produces a black PNG with no clue why.
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/field.js"></script>
+<script src="js/world.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
